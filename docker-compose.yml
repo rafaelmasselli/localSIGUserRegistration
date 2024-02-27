@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  localSIG:
+    image: postgres:alpine
+    ports:
+      - "5432:5432"
+    container_name: "localSIG"
+    restart: always
+    volumes:
+      - localSIG-data:/var/lib/postgresql/data  
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+volumes:
+  localSIG-data:

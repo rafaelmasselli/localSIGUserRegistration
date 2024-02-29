@@ -16,15 +16,22 @@ export function Home() {
   const getCompStep = () => {
     switch (step) {
       case 1:
-        return <VerifyEmailAndTelephone email={email} setEmail={setEmail} />;
+        return (
+          <VerifyEmailAndTelephone
+            step={step}
+            setStep={setStep}
+            email={email}
+            setEmail={setEmail}
+          />
+        );
     }
   };
 
-  function handleForm() {
-    step !== 3 && setStep(step + 1);
-    if (step == 1) {
-    }
-  }
+  // function handleForm() {
+
+  //   if (step == 1) {
+  //   }
+  // }
 
   return (
     <div className="min-h-screen mt-[-50px] flex items-center justify-center ">
@@ -46,24 +53,6 @@ export function Home() {
 
         <div className="w-full h-auto flex justify-center ">
           {getCompStep()}
-        </div>
-
-        <div className="flex justify-between mt-4">
-          <button
-            onClick={() => setStep(step - 1)}
-            disabled={step === 1}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-12 rounded m-2"
-          >
-            Voltar
-          </button>
-          <button
-            onClick={handleForm}
-            className={`${
-              step === 3 ? "bg-red-600" : "bg-gray-500"
-            } hover:bg-blue-600 text-white py-2 px-12 rounded m-2`}
-          >
-            {step === 3 ? "Enviar" : "Próximo"}
-          </button>
         </div>
       </div>
     </div>

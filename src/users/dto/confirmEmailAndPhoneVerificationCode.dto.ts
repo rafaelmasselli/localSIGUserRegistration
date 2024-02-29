@@ -8,4 +8,8 @@ export class ConfirmEmailAndPhoneVerificationCodeDto {
   @IsString({ message: "The 'phoneCode' field must be a string." })
   @IsNotEmpty({ message: "The 'phoneCode' field cannot be null." })
   phoneCode: string;
+
+  @IsString({ message: "The 'phoneCode' field must be a string." })
+  @IsNotEmpty({ message: "The 'phoneCode' field cannot be null." })
+  id: string;
 }

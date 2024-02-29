@@ -12,6 +12,16 @@ interface ICodes {
   telephoneCode: string;
 }
 
+interface IContacts {
+  email: string;
+  phone: string;
+}
+
+interface IZipCodeLocationApi {
+  uf: string;
+  city: string;
+}
+
 @Injectable()
 export class UsersService {
   constructor(private database: PrismaService) {}
@@ -32,8 +42,7 @@ export class UsersService {
     { emailCode, telephoneCode }: ICodes,
   ): Promise<ConfirmationCodes> {
     const { email, telephone } = createEmailAndTelephoneCodeDto;
-
-    return await this.database.confirmationCodes.create({
+    const user = await this.database.confirmationCodes.create({
       data: {
         email,
         emailCode,
@@ -41,35 +50,89 @@ export class UsersService {
         telephoneCode,
       },
     });
+    return user;
   }
 
-  async findUniqueAccessCode(email: string) {
+  async findUniqueByIdAccessCode(id: string) {
+    return await this.database.confirmationCodes.findUnique({
+      where: { id },
+    });
+  }
+
+  async findUniqueByEmailAccessCode(email: string) {
     return await this.database.confirmationCodes.findUnique({
       where: { email },
     });
   }
 
-  async deleteCodeAccess(email: string) {
+  async findUniqueByTelephoneAccessCode(phone: string) {
+    return await this.database.confirmationCodes.findUnique({
+      where: { phone },
+    });
+  }
+  async deleteCodeAccessByTelephone(telephone: string) {
+    return await this.database.confirmationCodes.delete({
+      where: { phone: telephone },
+    });
+  }
+
+  async deleteCodeAccessByEmail(email: string) {
     return await this.database.confirmationCodes.delete({
       where: { email },
     });
   }
 
+  async deleteCodeAccessById(id: string) {
+    return await this.database.confirmationCodes.delete({
+      where: { id },
+    });
+  }
+
+  async updateConfirmationCode(id: string) {
+    return await this.database.confirmationCodes.update({
+      where: { id },
+      data: {
+        confirmedCode: true,
+      },
+    });
+  }
   async createUserWithAddress(
     @Body() createUser: CreateUserDto,
     @Body() createAddress: CreateAddressDto,
+    @Body() { email, phone }: IContacts,
+    @Body() { city, uf }: IZipCodeLocationApi,
   ) {
-    // return await this.database.user.create({
-    //   data: {
-    //     ...createUser,
-    //     address: {
-    //       create: {
-    //         ...createAddress,
-    //       },
-    //     },
-    //   },
-    // });
+    const { cep, street } = createAddress;
+    const { age, birthDate, cpf, fullName, maritalStatus } = createUser;
 
-    return { createAddress, createUser };
+    const createdUser = await this.database.user.create({
+      data: {
+        age,
+        birthDate,
+        cpf,
+        fullName,
+        maritalStatus,
+        email,
+        phone,
+        address: {
+          create: {
+            city,
+            uf,
+            cep,
+            street,
+          },
+        },
+      },
+    });
+
+    return { user: createdUser };
+  }
+
+  async findManyUSers() {
+    return await this.database.user.findMany();
+  }
+
+  async findManyCodes() {
+    return await this.database.confirmationCodes.findMany({});
   }
 }

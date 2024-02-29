@@ -4,6 +4,8 @@ import {
   Controller,
   Post,
   NotFoundException,
+  Res,
+  Get,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -11,6 +13,7 @@ import {
   CreateAddressDto,
   CreateEmailAndTelephoneCodeDto,
   ConfirmEmailAndPhoneVerificationCodeDto,
+  IdDto,
 } from './dto/';
 import { validateCpf } from 'src/util/validateCpf';
 import * as nodemailer from 'nodemailer';
@@ -22,6 +25,7 @@ import {
 } from 'src/util/generateRandomCode';
 
 import * as twilio from 'twilio';
+import { Response } from 'express';
 
 const client = twilio(
   process.env.SERVICE_TWILIO_ACCOUNT_SID,
@@ -33,21 +37,43 @@ export class UsersController {
   email: string;
   confirmedCode: boolean;
   telephone: string;
-  constructor(private usersService: UsersService) {
-    this.email = null;
-    this.confirmedCode = false;
-    this.telephone = null;
+  constructor(private usersService: UsersService) {}
+
+  @Get('/')
+  async findManyUser() {
+    return await this.usersService.findManyUSers();
   }
 
-  @Post('/create/user/confirm/code')
+  @Get('/codes')
+  async findManyCodes() {
+    return await this.usersService.findManyCodes();
+  }
+
+  @Post('/create')
   async createUser(
     @Body() createUser: CreateUserDto,
     @Body() createAddress: CreateAddressDto,
+    @Body() idDto: IdDto,
+    @Res() res: Response,
   ) {
     const { cpf, maritalStatus } = createUser;
-    const { cep, city, uf } = createAddress;
+    const { cep } = createAddress;
+    const { id } = idDto;
 
-    const registeredEmail = await this.usersService.findUniqueEmail(this.email);
+    if (!id) throw new NotFoundException('Id field cannot be empty');
+
+    const emailAndTelephone =
+      await this.usersService.findUniqueByIdAccessCode(id);
+
+    if (!emailAndTelephone)
+      return res.status(400).json({
+        message: 'incorrect user id',
+      });
+
+    const email = emailAndTelephone.email;
+    const phone = emailAndTelephone.phone;
+
+    const registeredEmail = await this.usersService.findUniqueEmail(email);
     const registeredCpf = await this.usersService.findUniqueCpf(cpf);
 
     const allowedMaritalStatus = [
@@ -66,7 +92,11 @@ export class UsersController {
 
     const resultCep = resultZipCodeConsultation.data;
 
-    if (this.confirmedCode)
+    const uf = resultCep.uf;
+    const city = resultCep.localidade;
+
+    if (!uf || !city) throw new NotFoundException('Incorrect zip code');
+    else if (!emailAndTelephone.confirmedCode)
       throw new NotFoundException(
         'Confirm the phone and email code before continuing registration',
       );
@@ -74,59 +104,97 @@ export class UsersController {
       throw new ConflictException(
         `The marital status ${maritalStatus} is not allowed`,
       );
-    else if (resultCep.uf !== uf)
-      throw new ConflictException(
-        'The uf is not the same uf as the indicated zip code',
-      );
-    else if (resultCep.localidade !== city)
-      throw new ConflictException(
-        'The city is not the same as the city of the indicated zip code',
-      );
     else if (!matchCpf) throw new ConflictException('Invalid cpf');
     else if (registeredEmail)
       throw new ConflictException('E-mail already registered');
     else if (registeredCpf)
       throw new ConflictException('CPF already registered');
 
-    return await this.usersService.createUserWithAddress(
-      createUser,
-      createAddress,
-    );
+    await this.usersService
+      .createUserWithAddress(
+        createUser,
+        createAddress,
+        { email, phone },
+        { uf, city },
+      )
+      .then(async () => {
+        await this.usersService
+          .deleteCodeAccessById(id)
+          .catch((err) => {
+            return res.status(500).json({
+              message: err.message,
+            });
+          })
+          .then(() => {
+            return {
+              message: 'User created successfully',
+            };
+          });
+      })
+      .catch((err) => {
+        return res.status(500).json({
+          message: err.message,
+        });
+      });
   }
   @Post('/confirm/code')
   async ConfirmCode(
     @Body()
     confirmEmailAndPhoneVerificationCodeDto: ConfirmEmailAndPhoneVerificationCodeDto,
+    @Res() res: Response,
   ) {
-    const { emailCode, phoneCode } = confirmEmailAndPhoneVerificationCodeDto;
+    const { emailCode, phoneCode, id } =
+      confirmEmailAndPhoneVerificationCodeDto;
 
-    const codes = await this.usersService.findUniqueAccessCode(this.email);
+    const codes = await this.usersService.findUniqueByIdAccessCode(id);
 
     if (codes.telephoneCode !== phoneCode)
       throw new NotFoundException('Invalid code');
     else if (codes.emailCode !== emailCode)
       throw new NotFoundException('Invalid code');
     else {
-      this.confirmedCode = true;
+      await this.usersService.updateConfirmationCode(id);
     }
-
-    return {
+    return res.status(200).json({
       message: 'Code confirmed',
-      statusCode: 200,
-    };
+    });
   }
 
   @Post('/create/code')
   async CreateEmailCodeAndPhoneCode(
     @Body()
     createEmailAndTelephoneCodeDto: CreateEmailAndTelephoneCodeDto,
+    @Res() res: Response,
   ) {
     const { telephone, email } = createEmailAndTelephoneCodeDto;
     const emailCode = generateRandomNumber();
     const telephoneCode = generateRandomString();
+    const registeredEmail = await this.usersService.findUniqueEmail(email);
 
-    const accessCode = this.usersService.findUniqueAccessCode(email);
-    if (accessCode) await this.usersService.deleteCodeAccess(email);
+    const accessCodeByEmail =
+      await this.usersService.findUniqueByEmailAccessCode(email);
+
+    const accessCodeByTelephone =
+      await this.usersService.findUniqueByTelephoneAccessCode(telephone);
+
+    if (accessCodeByEmail) {
+      await this.usersService.deleteCodeAccessByEmail(email);
+    }
+
+    if (accessCodeByTelephone) {
+      await this.usersService.deleteCodeAccessByTelephone(telephone);
+    }
+    if (registeredEmail)
+      return res.status(409).json({
+        message: 'User already registered',
+      });
+
+    const existingConfirmationCode =
+      await this.usersService.findUniqueByEmailAccessCode(email);
+
+    if (existingConfirmationCode) {
+      await this.usersService.deleteCodeAccessByEmail(email);
+    }
 
     const transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com',
@@ -145,48 +213,30 @@ export class UsersController {
       html: emailHtml(emailCode),
     };
 
-    try {
-      await transporter.sendMail(mailOptions);
-    } catch (error) {
-      return {
-        statusCode: 400,
-        message: 'invalid email',
-        error: error.message,
-      };
-    }
+    await transporter.sendMail(mailOptions);
 
-    try {
-      await client.messages.create({
-        body: `Seu código de verificação é: ${telephoneCode}`,
-        from: '+14242901254',
-        to: `+${telephone}`,
-      });
-    } catch (error) {
-      return {
-        statusCode: 400,
-        message: 'invalid phone number',
-        error: error.message,
-      };
-    }
+    await client.messages.create({
+      body: `Seu código de verificação é: ${telephoneCode}`,
+      from: '+14242901254',
+      to: `+${telephone}`,
+    });
 
-    try {
-      await this.usersService.createEmailAndCellPhoneCode(
+    await this.usersService
+      .createEmailAndCellPhoneCode(
         { email, telephone },
         { emailCode, telephoneCode },
-      );
-    } catch {
-      return {
-        statusCode: 500,
-        message: 'Error creating code',
-      };
-    }
-
-    this.email = email;
-    this.telephone = telephone;
-
-    return {
-      statusCode: 200,
-      message: 'Phone and email verification code has been sent',
-    };
+      )
+      .then((result) => {
+        const userId = result.id;
+        return res.status(200).json({
+          id: userId,
+          message: `The phone and email verification code has been sent, copy the ID to confirm the phone and email`,
+        });
+      })
+      .catch((err) => {
+        return res.status(500).json({
+          message: err.message,
+        });
+      });
   }
 }

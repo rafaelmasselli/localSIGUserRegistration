@@ -37,5 +37,6 @@ model ConfirmationCodes {
   phone         String   @unique
   emailCode     String
   telephoneCode String
+  confirmedCode Boolean  @default(false)
   dateCreated   DateTime @default(now())
 }

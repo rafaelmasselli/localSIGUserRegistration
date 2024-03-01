@@ -90,7 +90,7 @@ export class UsersController {
       `https://viacep.com.br/ws/${zipCode}/json/`,
     );
 
-    const resultZipCode= resultZipCodeConsultation.data;
+    const resultZipCode = resultZipCodeConsultation.data;
 
     const uf = resultZipCode.uf;
     const city = resultZipCode.localidade;
@@ -213,13 +213,25 @@ export class UsersController {
       html: emailHtml(emailCode),
     };
 
-    await transporter.sendMail(mailOptions);
+    try {
+      await transporter.sendMail(mailOptions);
+    } catch (error) {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
 
-    await client.messages.create({
-      body: `Seu código de verificação é: ${telephoneCode}`,
-      from: '+14242901254',
-      to: `+${telephone}`,
-    });
+    try {
+      await client.messages.create({
+        body: `Seu código de verificação é: ${telephoneCode}`,
+        from: '+14242901254',
+        to: `+${telephone}`,
+      });
+    } catch (error) {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
 
     await this.usersService
       .createEmailAndCellPhoneCode(

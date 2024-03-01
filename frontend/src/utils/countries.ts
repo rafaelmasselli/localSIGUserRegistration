@@ -63,7 +63,7 @@ const rawCountries = [
   ["Bolivia", ["america", "south-america"], "bo", "591"],
   ["Bosnia and Herzegovina", ["europe", "ex-yugos"], "ba", "387"],
   ["Botswana", ["africa"], "bw", "267"],
-  ["Brazil", ["america", "south-america"], "br", "55", "(..) ........."],
+  ["Brazil", ["america", "south-america"], "br", "55", "(..) .....-...."],
   ["British Indian Ocean Territory", ["asia"], "io", "246"],
   ["Brunei", ["asia"], "bn", "673"],
   ["Bulgaria", ["europe", "eu-union"], "bg", "359"],

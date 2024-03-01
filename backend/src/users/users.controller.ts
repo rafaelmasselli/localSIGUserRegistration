@@ -57,7 +57,7 @@ export class UsersController {
     @Res() res: Response,
   ) {
     const { cpf, maritalStatus } = createUser;
-    const { cep } = createAddress;
+    const { zipCode } = createAddress;
     const { id } = idDto;
 
     if (!id) throw new NotFoundException('Id field cannot be empty');
@@ -87,13 +87,13 @@ export class UsersController {
     const matchCpf = validateCpf(cpf);
 
     const resultZipCodeConsultation = await axios.get(
-      `https://viacep.com.br/ws/${cep}/json/`,
+      `https://viacep.com.br/ws/${zipCode}/json/`,
     );
 
-    const resultCep = resultZipCodeConsultation.data;
+    const resultZipCode= resultZipCodeConsultation.data;
 
-    const uf = resultCep.uf;
-    const city = resultCep.localidade;
+    const uf = resultZipCode.uf;
+    const city = resultZipCode.localidade;
 
     if (!uf || !city) throw new NotFoundException('Incorrect zip code');
     else if (!emailAndTelephone.confirmedCode)
@@ -174,12 +174,12 @@ export class UsersController {
     const accessCodeByEmail =
       await this.usersService.findUniqueByEmailAccessCode(email);
 
-    const accessCodeByTelephone =
-      await this.usersService.findUniqueByTelephoneAccessCode(telephone);
-
     if (accessCodeByEmail) {
       await this.usersService.deleteCodeAccessByEmail(email);
     }
+
+    const accessCodeByTelephone =
+      await this.usersService.findUniqueByTelephoneAccessCode(telephone);
 
     if (accessCodeByTelephone) {
       await this.usersService.deleteCodeAccessByTelephone(telephone);

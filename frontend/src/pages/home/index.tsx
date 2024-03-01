@@ -4,37 +4,24 @@ import { VerifyEmailAndTelephone } from "../../components/structure/form/verifyE
 
 export function Home() {
   const [step, setStep] = useState(1);
-  const [email, setEmail] = useState("");
+
   const Steps = [1, 2, 3, 4];
   const phases = [
     "Cadastro de email e telefone",
-    "Confirma o codigo do telefone e do celular",
-    "Adiconar informacoes de usuario",
-    "Endereco do usuario",
+    "Confirma o código do telefone e do celular",
+    "Adicionar informações de usuário",
+    "Endereço do usuário",
   ];
 
   const getCompStep = () => {
     switch (step) {
       case 1:
-        return (
-          <VerifyEmailAndTelephone
-            step={step}
-            setStep={setStep}
-            email={email}
-            setEmail={setEmail}
-          />
-        );
+        return <VerifyEmailAndTelephone step={step} setStep={setStep} />;
     }
   };
 
-  // function handleForm() {
-
-  //   if (step == 1) {
-  //   }
-  // }
-
   return (
-    <div className="min-h-screen mt-[-50px] flex items-center justify-center ">
+    <div className="min-h-screen mt-2 flex items-center justify-center ">
       <div className="max-w-2xl shadow-2xl p-12 flex flex-col items-center ">
         <h1 className="font-bold text-xl mb-6 mt-[-12px]">
           {phases[step - 1]}

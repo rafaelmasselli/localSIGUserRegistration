@@ -1,13 +1,13 @@
-import { BrowserRouter } from "react-router-dom";
 import { Router } from "./routes/index.routes";
 import { Navbar } from "./components/shared/navbar/indext";
+import { Provider } from "./provider";
 
 function App() {
   return (
-    <BrowserRouter>
+    <Provider>
       <Navbar />
       <Router />
-    </BrowserRouter>
+    </Provider>
   );
 }
 

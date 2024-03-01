@@ -5,6 +5,9 @@ import { ButtonToProgressTheForm } from "../buttonToProgressTheForm";
 import { api } from "../../../../lib/axios";
 import { ErrorModal } from "../../errorModal";
 
+import { useCookies } from "react-cookie";
+import { Input } from "../../input";
+
 interface IVerifyEmailAndTelephone {
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
@@ -23,6 +26,8 @@ export function VerifyEmailAndTelephone({
   const [description, setDescription] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+  const [, setCookie] = useCookies(["id"]);
 
   function openModal(description: string) {
     setDescription(description);
@@ -46,27 +51,36 @@ export function VerifyEmailAndTelephone({
     else if (!number)
       openModal("O campo 'Número de Telefone' não pode ficar vazio.");
     else if (!ddd) openModal("O campo DDD não pode ficar em branco.");
+    else if (number.length < 13)
+      openModal(
+        "O número de telefone deve ser composto por, no mínimo, 11 dígitos."
+      );
     else {
       const phoneWithoutMask = number && number.replace(/\D/g, "");
-      const phone = numberDdd + phoneWithoutMask;
+      const phone = (numberDdd + phoneWithoutMask).replace(/\D/g, "");
+      const telephone = phone.substring(0, 13);
 
-      await api
-        .post("/user/create/code", {
-          telephone: phone,
-          email,
-        })
-        .then((res) => {
-          // setStep(step + 1);
-          // setLoading(false);
-          console.log(res.data.id);
-        })
-        .catch((error) => {
-          setLoading(false);
-          if (error.message == "Request failed with status code 409")
-            openModal("Este e-mail já está registrado em nosso sistema.");
-          else if (error.message)
-            openModal("O número de telefone ou e-mail fornecido é inválido.");
-        });
+      if (number?.length < 11)
+        openModal("O numero de telefone deve conter 11 números");
+      else {
+        await api
+          .post("/user/create/code", {
+            telephone,
+            email,
+          })
+          .then((res) => {
+            setStep(step + 1);
+            setLoading(false);
+            setCookie("id", res.data.id, { path: "/" });
+          })
+          .catch((error) => {
+            setLoading(false);
+            if (error.message == "Request failed with status code 409")
+              openModal("Este e-mail já está registrado em nosso sistema.");
+            else if (error.message)
+              openModal("O número de telefone ou e-mail fornecido é inválido.");
+          });
+      }
     }
   }
 
@@ -78,24 +92,12 @@ export function VerifyEmailAndTelephone({
           setShowModal={setShowModal}
           showModal={showModal}
         />
-        <div className="flex justify-center">
-          <div>
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-medium text-gray-900 "
-            >
-              Email
-            </label>
-            <input
-              onChange={(event) => setEmail(event.target.value)}
-              type="email"
-              id="email"
-              className="w-[350px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
-              placeholder="john.doe@company.com"
-              required
-            />
-          </div>
-        </div>
+        <Input
+          placeholder="joh.doe@company.com"
+          label="E-mail"
+          type="email"
+          onChange={setEmail}
+        />
         <div className="flex justify-center mt-2">
           <div>
             <Phone className="">

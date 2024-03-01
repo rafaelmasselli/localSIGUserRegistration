@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Step } from "../../components/structure/step";
 import { VerifyEmailAndTelephone } from "../../components/structure/form/verifyEmailAndTelephone";
 
 export function Home() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(() => {
+    const savedStep = localStorage.getItem("step");
+    return savedStep ? Number(savedStep) : 1;
+  });
 
   const Steps = [1, 2, 3, 4];
   const phases = [
@@ -19,6 +22,10 @@ export function Home() {
         return <VerifyEmailAndTelephone step={step} setStep={setStep} />;
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem("step", step.toString());
+  }, [step]);
 
   return (
     <div className="min-h-screen mt-2 flex items-center justify-center ">
@@ -37,7 +44,6 @@ export function Home() {
           ))}
         </div>
         <hr className="my-4 border-black border-t" />
-
         <div className="w-full h-auto flex justify-center ">
           {getCompStep()}
         </div>

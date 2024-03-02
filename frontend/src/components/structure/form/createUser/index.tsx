@@ -1,22 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ErrorModal } from "../../errorModal";
 import { ButtonToProgressTheForm } from "../buttonToProgressTheForm";
 import { Input } from "../../input";
 import { format } from "date-fns";
-import { api } from "../../../../lib/axios";
+import { useUserContext } from "../../../../hook/user";
 
 export function CreateUser() {
+  const { updateUser, user } = useUserContext();
+
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [description, setDescription] = useState("");
 
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [cpf, setCpf] = useState("");
+  const [zipCode, setZipCode] = useState("");
 
   const [maritalStatus, setMaritalStatus] = useState("");
 
-  const cpfMask = (value: string) => {
+  const zipCodeMask = (value: string) => {
     value = value.replace(/\D/g, "");
 
     if (value.length > 3) {
@@ -34,7 +36,7 @@ export function CreateUser() {
     return value;
   };
 
-  const stringCpfMask = (value: string) => cpfMask(value);
+  const stringZipCodeMask = (value: string) => zipCodeMask(value);
 
   function openModal(description: string) {
     setDescription(description);
@@ -42,7 +44,11 @@ export function CreateUser() {
     setLoading(false);
   }
 
+  const step = Number(localStorage.getItem("step"));
+  const stringValue = String(Number(step) + 1);
+
   async function handleCreateUser() {
+    setLoading(true);
     const month = Number(birthDate.substring(5, 7));
     const day = Number(birthDate.substring(8, 10));
 
@@ -78,10 +84,25 @@ export function CreateUser() {
 
     if (!fullName || !validateName(fullName))
       openModal("Preencha o campo 'Nome completo' corretamente");
-    else if (cpf.length < 14) openModal("O campo CPF deve conter 11 números");
+    else if (zipCode.length < 14)
+      openModal("O campo CPF deve conter 11 números");
     else if (year < 1902 || year > yearCurrent)
       openModal("Ano invalido, insira o ano que voce nasceu");
+    else {
+      updateUser({
+        fullName,
+        zipCode,
+        age,
+        birthDate,
+        maritalStatus,
+      });
+
+      localStorage.setItem("step", stringValue);
+      setLoading(false);
+    }
   }
+
+  useEffect(() => {}, [user]);
 
   return (
     <div className="w-full h-full mt-[-30px]">
@@ -103,9 +124,9 @@ export function CreateUser() {
           <Input
             placeholder="XXX.XXX.XXX-XX"
             type="string"
-            mask={stringCpfMask}
+            mask={stringZipCodeMask}
             label="CPF"
-            onChange={setCpf}
+            onChange={setZipCode}
             maxLength={14}
           />
         </div>

@@ -1,7 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
 import { ReactNode } from "react";
 import { CookiesProvider } from "react-cookie";
-import { UserContextProvider } from "../context/user";
+import { UserContextProvider, StepContextProvider } from "../context";
 
 interface ProviderProps {
   children: ReactNode;
@@ -9,10 +9,12 @@ interface ProviderProps {
 
 export function Provider({ children }: ProviderProps) {
   return (
-    <UserContextProvider>
-      <CookiesProvider>
-        <BrowserRouter>{children}</BrowserRouter>
-      </CookiesProvider>
-    </UserContextProvider>
+    <StepContextProvider>
+      <UserContextProvider>
+        <CookiesProvider>
+          <BrowserRouter>{children}</BrowserRouter>
+        </CookiesProvider>
+      </UserContextProvider>
+    </StepContextProvider>
   );
 }

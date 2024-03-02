@@ -2,10 +2,12 @@ import countries from "../../../../utils/countries";
 import { useEffect, useState } from "react";
 import { ButtonToProgressTheForm, ErrorModal, Phone, Input } from "../..";
 import { api } from "../../../../lib/axios";
+import { useStepContext } from "../../../../hook";
 
 import { useCookies } from "react-cookie";
 
 export function VerifyEmailAndTelephone() {
+  const { step, updateStep } = useStepContext();
   const [email, setEmail] = useState<string>("");
   const [ddd, setDdd] = useState<string>("");
   const [numberDdd, setNumberDdd] = useState<string | undefined>(undefined);
@@ -17,8 +19,6 @@ export function VerifyEmailAndTelephone() {
   const [loading, setLoading] = useState(false);
 
   const [, setCookie] = useCookies(["id"]);
-  const step = Number(localStorage.getItem("step"));
-  const stringValue = String(Number(step) + 1);
 
   function openModal(description: string) {
     setDescription(description);
@@ -34,7 +34,9 @@ export function VerifyEmailAndTelephone() {
     });
   }, [ddd]);
 
-  async function handleValidateEmailAndPassword() {
+  useEffect(() => {}, [step, updateStep]);
+
+  async function handleValidateEmailAndTelephone() {
     setLoading(true);
 
     if (!email) openModal("O campo 'e-mail' não pode ficar vazio");
@@ -60,8 +62,8 @@ export function VerifyEmailAndTelephone() {
             email,
           })
           .then((res) => {
-            localStorage.setItem("step", stringValue);
             setCookie("id", res.data.id, { path: "/" });
+            updateStep(step + 1);
           })
           .catch((error) => {
             if (error.message == "Request failed with status code 409")
@@ -122,7 +124,7 @@ export function VerifyEmailAndTelephone() {
       </div>
       <ButtonToProgressTheForm
         setLoading={setLoading}
-        handle={handleValidateEmailAndPassword}
+        handle={handleValidateEmailAndTelephone}
         loading={loading}
       />
     </div>

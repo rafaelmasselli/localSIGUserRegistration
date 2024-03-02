@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Input, ButtonToProgressTheForm, ErrorModal } from "../../";
 import { format } from "date-fns";
-import { useUserContext } from "../../../../hook/user";
+import { useUserContext, useStepContext } from "../../../../hook";
 
 export function CreateUser() {
+  const { step, updateStep } = useStepContext();
   const { updateUser, user } = useUserContext();
 
   const [showModal, setShowModal] = useState(false);
@@ -14,7 +15,7 @@ export function CreateUser() {
   const [birthDate, setBirthDate] = useState("");
   const [zipCode, setZipCode] = useState("");
 
-  const [maritalStatus, setMaritalStatus] = useState("");
+  const [maritalStatus, setMaritalStatus] = useState("Single");
 
   const zipCodeMask = (value: string) => {
     value = value.replace(/\D/g, "");
@@ -41,9 +42,6 @@ export function CreateUser() {
     setShowModal(true);
     setLoading(false);
   }
-
-  const step = Number(localStorage.getItem("step"));
-  const stringValue = String(Number(step) + 1);
 
   async function handleCreateUser() {
     setLoading(true);
@@ -94,13 +92,12 @@ export function CreateUser() {
         birthDate,
         maritalStatus,
       });
-
-      localStorage.setItem("step", stringValue);
+      updateStep(step + 1);
       setLoading(false);
     }
   }
 
-  useEffect(() => {}, [user]);
+  useEffect(() => {}, [user, step, updateStep]);
 
   return (
     <div className="w-full h-full mt-[-30px]">
@@ -143,6 +140,7 @@ export function CreateUser() {
             </label>
 
             <select
+              value={maritalStatus}
               onChange={(event) => {
                 setMaritalStatus(event.target.value);
               }}

@@ -5,11 +5,12 @@ import {
   CreateUser,
   VerifyEmailAndTelephone,
 } from "../../components/structure/form";
+import { useStepContext } from "../../hook/";
+import { CreateAddress } from "../../components/structure/form/createAddress";
 
 export function Home() {
-  let step: string | null = localStorage.getItem("step");
-  step = step ? step : "1";
-  const stepNumber = Number(step);
+  const { step, updateStep } = useStepContext();
+
   const Steps = [1, 2, 3, 4];
   const phases = [
     "Cadastro de email e telefone",
@@ -19,25 +20,27 @@ export function Home() {
   ];
 
   const getCompStep = () => {
-    switch (Number(step)) {
+    switch (step) {
       case 1:
         return <VerifyEmailAndTelephone />;
       case 2:
         return <ConfirmEmailAndPhoneCode />;
       case 3:
         return <CreateUser />;
+      case 4:
+        return <CreateAddress />;
     }
   };
 
   useEffect(() => {
-    localStorage.setItem("step", step);
-  }, [step]);
+    updateStep(step);
+  }, [step, updateStep]);
 
   return (
     <div className="min-h-screen mt-2 flex items-center justify-center ">
       <div className="max-w-2xl shadow-2xl p-12 flex flex-col items-center ">
         <h1 className="font-bold text-xl mb-6 mt-[-12px]">
-          {phases[stepNumber - 1]}
+          {phases[step - 1]}
         </h1>
         <div className="flex justify-between mb-4 ">
           {Steps.map((item) => (
@@ -45,7 +48,7 @@ export function Home() {
               className="m-2"
               key={item}
               index={item}
-              active={stepNumber === item}
+              active={step === item}
             />
           ))}
         </div>

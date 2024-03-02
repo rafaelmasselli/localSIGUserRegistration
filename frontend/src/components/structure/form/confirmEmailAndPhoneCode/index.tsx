@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ErrorModal, ButtonToProgressTheForm, Input } from "../../";
 import { api } from "../../../../lib/axios";
 import { useCookies } from "react-cookie";
+import { useStepContext } from "../../../../hook";
 
 export function ConfirmEmailAndPhoneCode() {
+  const { step, updateStep } = useStepContext();
   const [loading, setLoading] = useState<boolean>(false);
   const [emailCode, setEmailCode] = useState<string>("");
   const [phoneCode, setPhoneCode] = useState<string>("");
@@ -12,8 +14,6 @@ export function ConfirmEmailAndPhoneCode() {
   const [description, setDescription] = useState("");
 
   const [cookie] = useCookies(["id"]);
-  const step = Number(localStorage.getItem("step"));
-  const stringValue = String(Number(step) + 1);
 
   const numberMask = (value: string) => value.replace(/\D/g, "");
   const stringMask = (value: string) => value.replace(/\d/g, "").toUpperCase();
@@ -36,7 +36,7 @@ export function ConfirmEmailAndPhoneCode() {
     await api
       .post("/user/confirm/code", { id, emailCode, phoneCode })
       .then(() => {
-        localStorage.setItem("step", stringValue);
+        updateStep(step + 1);
       })
       .catch(() => {
         openModal(
@@ -46,6 +46,8 @@ export function ConfirmEmailAndPhoneCode() {
 
     setLoading(false);
   }
+
+  useEffect(() => {}, [step, updateStep]);
 
   return (
     <div className="w-full h-full mt-[-30px]">

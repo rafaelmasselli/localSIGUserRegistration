@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { ErrorModal } from "../../errorModal";
-import { ButtonToProgressTheForm } from "../buttonToProgressTheForm";
-import { Input } from "../../input";
+import { Input, ButtonToProgressTheForm, ErrorModal } from "../../";
 import { format } from "date-fns";
 import { useUserContext } from "../../../../hook/user";
 

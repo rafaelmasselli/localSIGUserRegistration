@@ -1,8 +1,10 @@
 import { useEffect } from "react";
-import { Step } from "../../components/structure/step";
-import { VerifyEmailAndTelephone } from "../../components/structure/form/verifyEmailAndTelephone";
-import { ConfirmEmailAndPhoneCode } from "../../components/structure/form/confirmEmailAndPhoneCode";
-import { CreateUser } from "../../components/structure/form/createUser";
+import { Step } from "../../components/structure";
+import {
+  ConfirmEmailAndPhoneCode,
+  CreateUser,
+  VerifyEmailAndTelephone,
+} from "../../components/structure/form";
 
 export function Home() {
   let step: string | null = localStorage.getItem("step");
@@ -23,7 +25,7 @@ export function Home() {
       case 2:
         return <ConfirmEmailAndPhoneCode />;
       case 3:
-        return <CreateUser />;  
+        return <CreateUser />;
     }
   };
 

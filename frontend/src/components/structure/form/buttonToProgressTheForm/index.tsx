@@ -1,5 +1,5 @@
 import React from "react";
-import { Spinner } from "../../spinner";
+import { Spinner } from "../../";
 import { useCookies } from "react-cookie";
 import { api } from "../../../../lib/axios";
 

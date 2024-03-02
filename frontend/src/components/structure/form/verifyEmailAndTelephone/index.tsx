@@ -1,12 +1,9 @@
-import { Phone } from "../../telephoneNumberAndAreaCode";
 import countries from "../../../../utils/countries";
 import { useEffect, useState } from "react";
-import { ButtonToProgressTheForm } from "../buttonToProgressTheForm";
+import { ButtonToProgressTheForm, ErrorModal, Phone, Input } from "../..";
 import { api } from "../../../../lib/axios";
-import { ErrorModal } from "../../errorModal";
 
 import { useCookies } from "react-cookie";
-import { Input } from "../../input";
 
 export function VerifyEmailAndTelephone() {
   const [email, setEmail] = useState<string>("");

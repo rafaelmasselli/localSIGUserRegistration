@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { ButtonToProgressTheForm } from "../buttonToProgressTheForm";
-import { Input } from "../../input";
+import { ErrorModal, ButtonToProgressTheForm, Input } from "../../";
 import { api } from "../../../../lib/axios";
 import { useCookies } from "react-cookie";
-import { ErrorModal } from "../../errorModal";
 
 export function ConfirmEmailAndPhoneCode() {
   const [loading, setLoading] = useState<boolean>(false);

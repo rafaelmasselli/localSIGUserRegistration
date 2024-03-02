@@ -53,6 +53,11 @@ export class UsersController {
   async findManyCodes() {
     return await this.usersService.findManyCodes();
   }
+  @Post('/findUnique/code/id')
+  async findUniqueCode(@Body() idDto: IdDto) {
+    const { id } = idDto;
+    return await this.usersService.findUniqueByIdAccessCode(id);
+  }
 
   @ApiOperation({ summary: 'Reset verification codes by ID' })
   @ApiResponse({

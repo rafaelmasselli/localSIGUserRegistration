@@ -102,7 +102,7 @@ export class UsersService {
     @Body() { email, phone }: IContacts,
     @Body() { city, uf }: IZipCodeLocationApi,
   ) {
-    const { zipCode, street, number } = createAddress;
+    const { zipCode, street, number, neighborhood } = createAddress;
     const { age, birthDate, cpf, fullName, maritalStatus } = createUser;
 
     const createdUser = await this.database.user.create({
@@ -121,6 +121,7 @@ export class UsersService {
             uf,
             zipCode,
             street,
+            neighborhood,
           },
         },
       },

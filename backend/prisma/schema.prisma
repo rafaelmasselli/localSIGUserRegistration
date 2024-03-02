@@ -21,15 +21,16 @@ model User {
 }
 
 model Address {
-  id        String   @id @unique @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
-  street    String
-  zipCode   String
-  city      String
-  number    Int
-  uf        String
-  createdAt DateTime @default(now())
+  id           String   @id @unique @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String   @unique
+  street       String
+  zipCode      String
+  neighborhood String
+  city         String
+  number       Int
+  uf           String
+  createdAt    DateTime @default(now())
 }
 
 model ConfirmationCodes {

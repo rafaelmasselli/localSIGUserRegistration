@@ -1,11 +1,11 @@
 import React, { createContext, useState, ReactNode, useEffect } from "react";
 
 interface UserType {
-  fullName: string;
-  zipCode: string;
-  maritalStatus: string;
-  birthDate: string;
-  age: number;
+  fullName?: string;
+  cpf?: string;
+  maritalStatus?: string;
+  birthDate?: string;
+  age?: number;
 }
 
 type UserContextType = {
@@ -24,7 +24,7 @@ const UserContextProvider: React.FC<{ children: ReactNode }> = ({
       ? JSON.parse(localData)
       : {
           fullName: "",
-          zipCode: "",
+          cpf: "",
           maritalStatus: "",
           birthDate: "",
           age: 0,

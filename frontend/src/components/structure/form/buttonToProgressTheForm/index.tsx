@@ -52,7 +52,7 @@ export function ButtonToProgressTheForm({
           <button
             onClick={handle}
             className={`transition-all duration-300 ease-in-out ${
-              step === 4 ? "bg-red-600" : "bg-gray-500"
+              step === 4 ? "bg-green-600" : "bg-gray-500"
             } hover:bg-blue-600 text-white py-2 px-12 rounded m-2 ml-5`}
           >
             {step === 4 ? "Cadastrar" : "Próximo"}

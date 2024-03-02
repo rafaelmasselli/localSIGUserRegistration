@@ -13,11 +13,11 @@ export function CreateUser() {
 
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [zipCode, setZipCode] = useState("");
+  const [cpf, setCpf] = useState("");
 
   const [maritalStatus, setMaritalStatus] = useState("Single");
 
-  const zipCodeMask = (value: string) => {
+  const cpfMask = (value: string) => {
     value = value.replace(/\D/g, "");
 
     if (value.length > 3) {
@@ -35,7 +35,7 @@ export function CreateUser() {
     return value;
   };
 
-  const stringZipCodeMask = (value: string) => zipCodeMask(value);
+  const stringCpfMask = (value: string) => cpfMask(value);
 
   function openModal(description: string) {
     setDescription(description);
@@ -80,17 +80,18 @@ export function CreateUser() {
 
     if (!fullName || !validateName(fullName))
       openModal("Preencha o campo 'Nome completo' corretamente");
-    else if (zipCode.length < 14)
-      openModal("O campo CPF deve conter 11 números");
+    else if (cpf.length < 13) openModal("O campo CPF deve conter 11 números");
     else if (year < 1902 || year > yearCurrent)
       openModal("Ano invalido, insira o ano que voce nasceu");
     else {
       updateUser({
         fullName,
-        zipCode,
+        cpf,
         age,
         birthDate,
         maritalStatus,
+        email: user.email,
+        telephone: user.telephone,
       });
       updateStep(step + 1);
       setLoading(false);
@@ -119,9 +120,9 @@ export function CreateUser() {
           <Input
             placeholder="XXX.XXX.XXX-XX"
             type="string"
-            mask={stringZipCodeMask}
+            mask={stringCpfMask}
             label="CPF"
-            onChange={setZipCode}
+            onChange={setCpf}
             maxLength={14}
           />
         </div>

@@ -8,15 +8,7 @@ import { ErrorModal } from "../../errorModal";
 import { useCookies } from "react-cookie";
 import { Input } from "../../input";
 
-interface IVerifyEmailAndTelephone {
-  step: number;
-  setStep: React.Dispatch<React.SetStateAction<number>>;
-}
-
-export function VerifyEmailAndTelephone({
-  setStep,
-  step,
-}: IVerifyEmailAndTelephone) {
+export function VerifyEmailAndTelephone() {
   const [email, setEmail] = useState<string>("");
   const [ddd, setDdd] = useState<string>("");
   const [numberDdd, setNumberDdd] = useState<string | undefined>(undefined);
@@ -28,6 +20,8 @@ export function VerifyEmailAndTelephone({
   const [loading, setLoading] = useState(false);
 
   const [, setCookie] = useCookies(["id"]);
+  const step = Number(localStorage.getItem("step"));
+  const stringValue = String(Number(step) + 1);
 
   function openModal(description: string) {
     setDescription(description);
@@ -69,23 +63,22 @@ export function VerifyEmailAndTelephone({
             email,
           })
           .then((res) => {
-            setStep(step + 1);
-            setLoading(false);
+            localStorage.setItem("step", stringValue);
             setCookie("id", res.data.id, { path: "/" });
           })
           .catch((error) => {
-            setLoading(false);
             if (error.message == "Request failed with status code 409")
               openModal("Este e-mail já está registrado em nosso sistema.");
             else if (error.message)
               openModal("O número de telefone ou e-mail fornecido é inválido.");
           });
+        setLoading(false);
       }
     }
   }
 
   return (
-    <div className="w-full h-full mt-[-20px]">
+    <div className="w-full h-full mt-[-30px]">
       <div className="w-full">
         <ErrorModal
           description={description}
@@ -131,9 +124,8 @@ export function VerifyEmailAndTelephone({
         </div>
       </div>
       <ButtonToProgressTheForm
+        setLoading={setLoading}
         handle={handleValidateEmailAndPassword}
-        setStep={setStep}
-        step={step}
         loading={loading}
       />
     </div>

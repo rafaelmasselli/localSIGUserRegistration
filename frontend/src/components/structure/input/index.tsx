@@ -1,11 +1,33 @@
+import React, { useState } from "react";
+
 interface IIpunt {
   label: string;
   type: string;
-  onChange: React.Dispatch<React.SetStateAction<string>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onChange: any;
   placeholder: string;
+  maxLength?: number;
+  mask?: (value: string) => string;
 }
 
-export function Input({ label, type, onChange, placeholder }: IIpunt) {
+export function Input({
+  label,
+  type,
+  onChange,
+  placeholder,
+  maxLength,
+  mask,
+}: IIpunt) {
+  const [value, setValue] = useState("");
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let val = event.target.value;
+    if (mask) {
+      val = mask(val);
+    }
+    setValue(val);
+    onChange(val);
+  };
+
   return (
     <div className="flex justify-center">
       <div>
@@ -17,12 +39,14 @@ export function Input({ label, type, onChange, placeholder }: IIpunt) {
         </label>
 
         <input
-          onChange={(event) => onChange(event.target.value)}
+          onChange={handleChange}
           type={type}
+          value={value}
           id="email"
           className="w-[350px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
           placeholder={placeholder}
           required
+          maxLength={maxLength}
         />
       </div>
     </div>

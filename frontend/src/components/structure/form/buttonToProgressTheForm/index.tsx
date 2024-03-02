@@ -1,19 +1,40 @@
 import React from "react";
 import { Spinner } from "../../spinner";
+import { useCookies } from "react-cookie";
+import { api } from "../../../../lib/axios";
 
 interface IButtonToProgressTheForm {
-  step: number;
   handle: () => void;
-  setStep: React.Dispatch<React.SetStateAction<number>>;
   loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function ButtonToProgressTheForm({
   handle,
-  setStep,
-  step,
   loading,
+  setLoading,
 }: IButtonToProgressTheForm) {
+  const [cookie, setCookie] = useCookies(["id"]);
+  const step = Number(localStorage.getItem("step"));
+  const updatedData = "1";
+
+  const updatedDataString = String(updatedData);
+
+  async function handleResetForm() {
+    setLoading(true);
+    const id = cookie;
+
+    if (id) {
+      api.delete("/user/reset", { data: { id: id } }).then(() => {
+        setCookie("id", "", { path: "/" });
+      });
+    }
+
+    localStorage.setItem("step", updatedDataString);
+    setLoading(false);
+    window.location.reload();
+  }
+
   return (
     <div className="flex justify-center mt-4">
       {loading ? (
@@ -23,7 +44,7 @@ export function ButtonToProgressTheForm({
       ) : (
         <>
           <button
-            onClick={() => setStep(step - 1)}
+            onClick={handleResetForm}
             className="transition-all duration-300 ease-in-out bg-gray-300 hover:bg-red-500 hover:text-white text-gray-800 py-2 px-12 rounded m-2 mr-5"
           >
             Cancelar
@@ -31,10 +52,10 @@ export function ButtonToProgressTheForm({
           <button
             onClick={handle}
             className={`transition-all duration-300 ease-in-out ${
-              step === 3 ? "bg-red-600" : "bg-gray-500"
+              step === 4 ? "bg-red-600" : "bg-gray-500"
             } hover:bg-blue-600 text-white py-2 px-12 rounded m-2 ml-5`}
           >
-            {step === 3 ? "Cadastrar" : "Próximo"}
+            {step === 4 ? "Cadastrar" : "Próximo"}
           </button>
         </>
       )}

@@ -27,6 +27,7 @@ model Address {
   street    String
   zipCode   String
   city      String
+  number    Int
   uf        String
   createdAt DateTime @default(now())
 }

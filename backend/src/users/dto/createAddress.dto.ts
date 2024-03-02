@@ -8,4 +8,8 @@ export class CreateAddressDto {
   @IsString({ message: "The 'street' field must be a string." })
   @IsNotEmpty({ message: "The 'street' field cannot be null." })
   street: string;
+
+  @IsString({ message: "The 'street' field must be a string." })
+  @IsNotEmpty({ message: "The 'street' field cannot be null." })
+  number: number;
 }

@@ -90,8 +90,6 @@ export function CreateUser() {
         age,
         birthDate,
         maritalStatus,
-        email: user.email,
-        telephone: user.telephone,
       });
       updateStep(step + 1);
       setLoading(false);
@@ -146,7 +144,7 @@ export function CreateUser() {
                 setMaritalStatus(event.target.value);
               }}
               id="cars"
-              className="w-[350px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
+              className="w-[250px] mine_mobile:w-[300px] mobile:w-[350px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
             >
               <option value="Single">Solteiro(a)</option>
               <option value="Married">Casado(a)</option>

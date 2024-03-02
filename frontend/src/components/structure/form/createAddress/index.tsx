@@ -41,7 +41,7 @@ export function CreateAddress() {
   const [city, setCity] = useState("");
   const [neighborhood, setNeighborhood] = useState("");
 
-  const [cookie] = useCookies(["id"]);
+  const [cookie, , removeCookie] = useCookies(["id"]);
 
   function openModal(description: string) {
     setDescription(description);
@@ -117,6 +117,7 @@ export function CreateAddress() {
         })
         .then(() => {
           updateStep(step + 1);
+          removeCookie("id");
         })
         .catch((err) => {
           console.log(err);

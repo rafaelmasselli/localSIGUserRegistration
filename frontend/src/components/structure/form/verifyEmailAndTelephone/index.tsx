@@ -101,9 +101,9 @@ export function VerifyEmailAndTelephone() {
               </label>
               <Phone.Country
                 onChange={(event) => setDdd(event.target.value)}
-                className="w-[350px]
+                className="w-[250px] mine_mobile:w-[300px] mobile:w-[350px]
               bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-              focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+              focus:ring-blue-500 focus:border-blue-500 block p-2.5 "
               />
               <label
                 htmlFor="email"
@@ -114,7 +114,7 @@ export function VerifyEmailAndTelephone() {
               <Phone.Number
                 onChange={(event) => setNumber(event.target.value)}
                 placeholder="6 12 34 56 78"
-                className="w-[350px]
+                className="w-[250px] mine_mobile:w-[300px] mobile:w-[350px]
                 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
               />

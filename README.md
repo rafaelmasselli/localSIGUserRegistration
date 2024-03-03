@@ -1,6 +1,6 @@
 ## Projeto LocalSig
 
-<div style="text-align: center;">
+<div align="center" >
      <img width="300" alt="Logo da empresa localsig" src="./.github/localsigLogo.webp"/>
 </div>
 

@@ -31,6 +31,14 @@ export class UsersService {
     });
   }
 
+  async deleteUser(id: string) {
+    await this.database.address.deleteMany({
+      where: { userId: id },
+    });
+    return await this.database.user.delete({
+      where: { id },
+    });
+  }
   async findUniqueCpf(@Body() cpf: string): Promise<User> {
     return await this.database.user.findUnique({
       where: { cpf },
@@ -131,7 +139,14 @@ export class UsersService {
   }
 
   async findManyUSers() {
-    return await this.database.user.findMany();
+    return await this.database.user.findMany({
+      orderBy: {
+        dateCreated: 'asc',
+      },
+      include: {
+        address: true,
+      },
+    });
   }
 
   async findManyCodes() {

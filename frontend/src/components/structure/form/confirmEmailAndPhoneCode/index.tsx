@@ -59,7 +59,7 @@ export function ConfirmEmailAndPhoneCode() {
         />
         <div className="">
           <Input
-            placeholder=""
+            placeholder="1234567"
             type="string"
             label="Código de verificação do email"
             onChange={setEmailCode}
@@ -69,7 +69,7 @@ export function ConfirmEmailAndPhoneCode() {
         </div>
         <div className="mt-2">
           <Input
-            placeholder=""
+            placeholder="ABCDEF"
             type="string"
             label="Código de verificação do telefone"
             onChange={setPhoneCode}

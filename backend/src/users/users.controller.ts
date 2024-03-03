@@ -7,6 +7,7 @@ import {
   Res,
   Get,
   Delete,
+  Param,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -27,13 +28,14 @@ import {
 
 import * as twilio from 'twilio';
 import { Response } from 'express';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 const client = twilio(
   process.env.SERVICE_TWILIO_ACCOUNT_SID,
   process.env.SERVICE_TWILIO_AUTH_TOKEN,
 );
 
+@ApiTags('user')
 @Controller('user')
 export class UsersController {
   email: string;
@@ -42,47 +44,53 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Retorna todos os usuários cadastrados' })
-  @ApiResponse({ status: 200, description: 'Return all users' })
+  @ApiResponse({ status: 200, description: 'Returns all users' })
   @Get('/')
   async findManyUser() {
     return await this.usersService.findManyUSers();
   }
   @ApiOperation({ summary: 'Retorna todos os códigos cadastrados' })
-  @ApiResponse({ status: 200, description: 'Return all verification codes' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns all verification codes',
+  })
   @Get('/codes')
   async findManyCodes() {
     return await this.usersService.findManyCodes();
   }
-  @Post('/findUnique/code/id')
-  async findUniqueCode(@Body() idDto: IdDto) {
-    const { id } = idDto;
-    return await this.usersService.findUniqueByIdAccessCode(id);
-  }
 
-  @ApiOperation({ summary: 'Reset verification codes by ID' })
+  @ApiOperation({ summary: 'Deleta o campo de código de verificação' })
   @ApiResponse({
     status: 200,
     description: 'Verification codes reset successfully',
   })
   @ApiResponse({ status: 404, description: 'User not found' })
-  @Delete('/reset')
+  @Delete('/delete/code')
   async restartForm(@Body() idDto: IdDto) {
     return await this.usersService.deleteCodeAccessById(idDto.id);
   }
 
-  @ApiOperation({ summary: 'Create a new user with address' })
-  @ApiResponse({ status: 201, description: 'User created successfully' })
+  @ApiOperation({ summary: 'Deleta o usuário' })
+  @ApiResponse({
+    status: 200,
+    description: 'Verification codes reset successfully',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @Delete('/delete/:id')
+  async deleteUser(@Param('id') id: string) {
+    return await this.usersService.deleteUser(id);
+  }
+
+  @ApiOperation({ summary: 'Cria códigos de verificação do e-mail e telefone' })
+  @ApiResponse({
+    status: 200,
+    description: 'Verification codes sent successfully',
+    type: Object,
+  })
   @ApiResponse({
     status: 400,
-    description: 'Incorrect user ID or invalid input',
+    description: 'Error sending verification codes or invalid entry',
   })
-  @ApiResponse({ status: 403, description: 'Forbidden' })
-  @ApiResponse({ status: 404, description: 'Incorrect zip code or user ID' })
-  @ApiResponse({
-    status: 409,
-    description: 'User already registered or invalid data',
-  })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
   @Post('/create')
   async createUser(
     @Body() createUser: CreateUserDto,
@@ -172,7 +180,9 @@ export class UsersController {
       });
   }
 
-  @ApiOperation({ summary: 'Confirm email and phone verification codes' })
+  @ApiOperation({
+    summary: 'Confirme os códigos de verificação de e-mail e telefone',
+  })
   @ApiResponse({ status: 200, description: 'Code confirmed successfully' })
   @ApiResponse({ status: 400, description: 'Invalid code or invalid input' })
   @Post('/confirm/code')
@@ -198,17 +208,19 @@ export class UsersController {
     });
   }
 
-  @ApiOperation({ summary: 'Create email and phone verification codes' })
+  @ApiOperation({
+    summary: 'Criar códigos de verificação por e-mail e telefone',
+  })
   @ApiResponse({
     status: 200,
     description: 'Verification codes sent successfully',
   })
   @ApiResponse({
     status: 400,
-    description: 'Error sending verification codes or invalid input',
+    description: 'Error sending verification codes or invalid entry',
   })
-  @ApiResponse({ status: 409, description: 'User already registered' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: 409, description: 'Usuário já cadastrado' })
+  @ApiResponse({ status: 500, description: 'Erro interno do servidor' })
   @Post('/create/code')
   async CreateEmailCodeAndPhoneCode(
     @Body()

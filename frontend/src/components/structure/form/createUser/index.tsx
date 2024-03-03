@@ -144,9 +144,11 @@ export function CreateUser() {
                 setMaritalStatus(event.target.value);
               }}
               id="cars"
-              className="w-[250px] mine_mobile:w-[300px] mobile:w-[350px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
+              className="w-[350px] max-mine_mobile:w-[250px] max-mobile:w-[300px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5 "
             >
-              <option value="Single">Solteiro(a)</option>
+              <option className="" value="Single">
+                Solteiro(a)
+              </option>
               <option value="Married">Casado(a)</option>
               <option value="Separated">Separado(a)</option>
               <option value="Divorced">Divorciado(a)</option>

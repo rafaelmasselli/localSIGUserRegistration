@@ -26,7 +26,7 @@ interface Address {
 }
 
 export function CreateAddress() {
-  const { user } = useUserContext();
+  const { user, updateUser } = useUserContext();
   const { step, updateStep } = useStepContext();
   const [loading, setLoading] = useState<boolean>(false);
   const [formError, setFormError] = useState<boolean>(false);
@@ -73,7 +73,6 @@ export function CreateAddress() {
         .get(`https://viacep.com.br/ws/${ZipCode}/json/`)
         .then((response) => {
           setUf(response.data.uf);
-          console.log(response.data.uf);
           setCity(response.data.localidade);
         })
         .catch(() => {
@@ -118,6 +117,13 @@ export function CreateAddress() {
         .then(() => {
           updateStep(step + 1);
           removeCookie("id");
+          updateUser({
+            age: 0,
+            birthDate: "",
+            cpf: "",
+            fullName: "",
+            maritalStatus: "",
+          });
         })
         .catch((err) => {
           console.log(err);

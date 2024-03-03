@@ -13,7 +13,6 @@ async function bootstrap() {
       'O projeto consiste em um sistema de cadastro que realiza a validação do usuário por meio do email e do telefone, utilizando confirmação via email e SMS, respectivamente. Após a confirmação bem-sucedida do email e do telefone, o cadastro do usuário estará pronto para funcionar normalmente.',
     )
     .setVersion('1.0')
-    .addTag('cats')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

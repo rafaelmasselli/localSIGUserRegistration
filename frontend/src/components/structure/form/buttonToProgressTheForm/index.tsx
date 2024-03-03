@@ -19,12 +19,13 @@ export function ButtonToProgressTheForm({
   const { step, updateStep } = useStepContext();
   const { updateUser } = useUserContext();
 
+  const sizeStyle = "px-[50px] py-2  rounded m-2 mobile:mx-3 mx-2";
   async function handleResetForm() {
     setLoading(true);
     const id = cookie;
 
     if (id) {
-      api.delete("/user/reset", { data: { id: id } }).then(() => {
+      api.delete("/user/delete/code", { data: { id: id } }).then(() => {
         removeCookie("id");
       });
     }
@@ -50,7 +51,7 @@ export function ButtonToProgressTheForm({
         <>
           <button
             onClick={handleResetForm}
-            className="transition-all duration-300 ease-in-out bg-gray-300 hover:bg-red-500 hover:text-white text-gray-800 py-2 px-12 rounded m-2 mobile:mx-5 mx-2"
+            className={`transition-all duration-300 ease-in-out bg-gray-300 hover:bg-red-500 hover:text-white text-gray-800 py-2 ${sizeStyle}  rounded `}
           >
             Cancelar
           </button>
@@ -58,12 +59,12 @@ export function ButtonToProgressTheForm({
             onClick={handle}
             className={`transition-all duration-300 ease-in-out ${
               step === 4 ? "bg-green-600" : "bg-gray-500"
-            } hover:bg-blue-600 text-white py-2 px-12 rounded m-2 mobile:mx-5 mx-2`}
+            } hover:bg-blue-600 text-white ${sizeStyle}`}
           >
             {step === 4 ? "Cadastrar" : "Próximo"}
           </button>
         </>
       )}
-    </div>
+    </div>  
   );
 }

@@ -1,39 +1,164 @@
-export function CardUser() {
+import { useState } from "react";
+import { api } from "../../../lib/axios";
+
+interface IUser {
+  age: number;
+  birthDate: string;
+  cpf: string;
+  email: string;
+  fullName: string;
+  id: string;
+  maritalStatus: string;
+  phone: string;
+  city: string;
+
+  neighborhood: string;
+  number: number;
+  street: string;
+  uf: string;
+  zipCode: string;
+}
+
+export function CardUser({
+  fullName,
+  cpf,
+  id,
+  age,
+  birthDate,
+  email,
+  phone,
+  maritalStatus,
+  city,
+  street,
+  neighborhood,
+  number,
+  uf,
+}: IUser) {
+  const [showModal, setShowModal] = useState(false);
+
+  function hideCpf(str: string): string {
+    return "X".repeat(str.length - 3) + str.slice(-7);
+  }
+
+  function addPhoneNumberMask(phoneNumber: string): string {
+    const numbers = phoneNumber.replace(/\D/g, "");
+    const formattedPhoneNumber = numbers.replace(
+      /(\d{2})(\d{5})(\d{4})/,
+      "($1) $2-$3"
+    );
+    return formattedPhoneNumber;
+  }
+
+  function formatDate(date: string): string {
+    const parts = date.split("-");
+    if (parts.length === 3) {
+      const [year, month, day] = parts;
+      return `${day}/${month}/${year}`;
+    } else {
+      return date;
+    }
+  }
+
+  async function handleDeleteUser() {
+    await api.delete(`/user/delete/${id}`);
+  }
+
   return (
-    <div className="w-full max-w-full mb-8 sm:w-1/2 px-4 lg:w-1/3 flex flex-col">
-      <img
-        src="https://source.unsplash.com/7JX0-bfiuxQ/400x300"
-        alt="Card img"
-        className="object-cover object-center w-full h-48"
-      />
-      <div className="flex flex-grow">
-        <div className="triangle"></div>
-        <div className="flex flex-col justify-between px-4 py-6 bg-white border border-gray-400">
+    <div>
+      {showModal ? (
+        <>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-xl">
+              <div className="border-0  shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                <div className="flex items-start justify-between p-4 rounded-t">
+                  <h3 className="text-xl font-semibold">
+                    Endereço do {fullName}
+                  </h3>
+                </div>
+                <div className="relative mt-[-20px] mb-[-20px] p-6 flex-auto">
+                  <p className="text-gray-700 text-base font-bold ">
+                    <strong>Cidade</strong>
+                    <br></br> {`${city} ${uf}`}
+                  </p>
+                  <p className="text-gray-700 text-base font-bold mt-2">
+                    <strong>Local da moradia</strong>
+                    <br></br> {street}
+                  </p>
+
+                  <p className="text-gray-700 text-base font-bold mt-2">
+                    <strong>Rua</strong>
+                    <br></br>
+                    {neighborhood}
+                  </p>
+                  <p className="text-gray-700 text-base font-bold mt-2">
+                    <strong>Numero</strong>
+                    <br></br>
+                    {number}
+                  </p>
+                </div>
+                <div className="flex items-center justify-end p-2 rounded-b">
+                  <button
+                    className="text-red-500 background-transparent font-bold uppercase px-10 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Sair
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+        </>
+      ) : null}
+      <div className="max-w-72 rounded overflow-hidden shadow-lg">
+        <div className="px-6 py-4 flex flex-col justify-center">
+          <div className="font-bold text-xl mb-2 mt-4">{fullName}</div>
           <div>
-            <a
-              href="#"
-              className="inline-block mb-4 text-xs font-bold capitalize border-b-2 border-blue-600 hover:text-blue-600"
-            >
-              Intellectual Capital
-            </a>
-            <a
-              href="#"
-              className="block mb-4 text-2xl font-black leading-tight hover:underline hover:text-blue-600"
-            >
-              5 Things To Do About Rain
-            </a>
-            <p className="mb-4">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ratione,
-              neque. Eius, ea possimus.
+            <p className="text-gray-700 text-base font-normal mt-2">
+              <strong>Data de nascimento</strong>
+              <br></br> {formatDate(birthDate)}
+            </p>
+            <p className="text-gray-700 text-base font-normal mt-2">
+              <strong>Idade</strong>
+              <br></br> {age}
+            </p>
+
+            <p className="text-gray-700 text-base font-normal mt-2">
+              <strong>Numero de Telefone</strong>
+              <br></br>
+              {addPhoneNumberMask(phone)}
+            </p>
+
+            <p className="text-gray-700 text-base font-normal mt-2">
+              <strong>CPF</strong>
+              <br></br>
+              {hideCpf(cpf)}
+            </p>
+            <p className="text-gray-700 text-base font-normal mt-2">
+              <strong>E-mail</strong>
+              <br></br>
+              {email}
+            </p>
+            <p className="text-gray-700 text-base font-normal mt-2">
+              <strong>Estado civil</strong>
+              <br></br>
+              {maritalStatus}
             </p>
           </div>
-          <div>
-            <a
-              href="#"
-              className="inline-block pb-1 mt-2 text-base font-black text-blue-600 uppercase border-b border-transparent hover:border-blue-600"
+          <div className="flex justify-center flex-col">
+            <button
+              onClick={() => setShowModal(true)}
+              className="mt-6 justify-center px-4  py-2 bg-blue-500 text-white active:bg-blue-600 text-xs font-bold uppercase  rounded shadow hover:shadow-lg outline-none focus:outline-none lg:mr-1 lg:mb-0  ease-linear transition-all duration-150 flex"
             >
-              Read
-            </a>
+              Exibir endereço
+            </button>
+            <button
+              onClick={handleDeleteUser}
+              className="mt-2 justify-center px-4  py-2 bg-red-500 text-white active:bg-blue-600 text-xs font-bold uppercase  rounded shadow hover:shadow-lg outline-none focus:outline-none lg:mr-1 lg:mb-0  ease-linear transition-all duration-150 flex"
+            >
+              Deletar usuário
+            </button>
           </div>
         </div>
       </div>

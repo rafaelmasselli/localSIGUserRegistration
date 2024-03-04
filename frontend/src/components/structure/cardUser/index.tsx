@@ -59,8 +59,25 @@ export function CardUser({
     }
   }
 
+  function translateMaritalStatus(status: string) {
+    if (status === "Single") {
+      return "Solteiro";
+    } else if (status === "Married") {
+      return "Casado";
+    } else if (status === "Separated") {
+      return "Separado";
+    } else if (status === "Divorced") {
+      return "Divorciado";
+    } else if (status === "Widowed") {
+      return "Viúvo";
+    } else {
+      return status;
+    }
+  }
+
   async function handleDeleteUser() {
     await api.delete(`/user/delete/${id}`);
+
   }
 
   return (
@@ -143,7 +160,7 @@ export function CardUser({
             <p className="text-gray-700 text-base font-normal mt-2">
               <strong>Estado civil</strong>
               <br></br>
-              {maritalStatus}
+              {translateMaritalStatus(maritalStatus)}
             </p>
           </div>
           <div className="flex justify-center flex-col">

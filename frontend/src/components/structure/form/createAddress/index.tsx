@@ -64,71 +64,78 @@ export function CreateAddress() {
   }, [formError, showModal, step, updateStep]);
 
   async function handleCreateUser() {
-    setLoading(true);
+    try {
+      setLoading(true);
+      const configApi = {
+        id: cookie.id,
+        fullName: user.fullName,
+        age: Number(user.age),
+        maritalStatus: user.maritalStatus,
+        birthDate: user.birthDate,
+        cpf: user.cpf,
+        number: Number(number),
+        street,
+        zipCode,
+        city,
+        uf,
+        neighborhood,
+      };
 
-    const ZipCode = zipCode.replace(/-/g, "");
+      const ZipCode = zipCode.replace(/-/g, "");
 
-    if (ZipCode && zipCode.length == 9) {
-      await api
-        .get(`https://viacep.com.br/ws/${ZipCode}/json/`)
-        .then((response) => {
-          setUf(response.data.uf);
-          setCity(response.data.localidade);
-        })
-        .catch(() => {
-          openModal("CEP incorreto");
+      if (zipCode) {
+        const response = await api.get(
+          `https://viacep.com.br/ws/${ZipCode}/json/`
+        );
+        setUf(response.data.uf);
+        setCity(response.data.localidade);
+      }
+
+      if (
+        !user.age ||
+        !user.birthDate ||
+        !user.cpf ||
+        !user.fullName ||
+        !user.maritalStatus
+      ) {
+        openModal(
+          "Houve um contratempo. Por favor, retorne à seção de inserção de dados para corrigir a situação."
+        );
+        setFormError(true);
+        setLoading(false);
+        return;
+      }
+
+      if (uf === "" || city === "") {
+        openModal("Digite o CEP correspondente à sua cidade.");
+        setLoading(false);
+      } else if (!zipCode) {
+        openModal("O campo CEP está incompleto.");
+        setLoading(false);
+      } else if (!street) {
+        openModal("O campo 'Rua' não pode estar vazio.");
+        setLoading(false);
+      } else if (!number) {
+        openModal("O numero nao pode estar vazio");
+        setLoading(false);
+      } else {
+        setLoading(false);
+        updateStep(step + 1);
+        removeCookie("id");
+        updateUser({
+          age: 0,
+          birthDate: "",
+          cpf: "",
+          fullName: "",
+          maritalStatus: "",
         });
+        await api.post("/user/create", configApi);
+      }
+    } catch (error) {
+      console.error("Error in handleCreateUser:", error);
+      openModal("Erro ao criar usuário");
+      setLoading(false);
     }
-
-    if (
-      !user.age ||
-      !user.birthDate ||
-      !user.cpf ||
-      !user.fullName ||
-      !user.maritalStatus
-    ) {
-      openModal(
-        "Houve um contratempo. Por favor, retorne à seção de inserção de dados para corrigir a situação."
-      );
-      setFormError(true);
-    }
-
-    if (uf == "" || city == "")
-      openModal("Digite o CEP correspondente à sua cidade.");
-    else if (Number(zipCode) < 9) openModal("O campo CEP está incompleto.");
-    else if (!street) openModal("O campo 'Rua' não pode estar vazio.");
-    else if (!number) openModal("O numero nao pode estar vazio");
-    else
-      api
-        .post<User>("/user/create", {
-          id: cookie.id,
-          fullName: user.fullName,
-          age: Number(user.age),
-          maritalStatus: user.maritalStatus,
-          birthDate: user.birthDate,
-          cpf: user.cpf,
-          number: Number(number),
-          street,
-          zipCode,
-          city,
-          uf,
-          neighborhood,
-        })
-        .then(() => {
-          updateStep(step + 1);
-          removeCookie("id");
-          updateUser({
-            age: 0,
-            birthDate: "",
-            cpf: "",
-            fullName: "",
-            maritalStatus: "",
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    setLoading(false);
   }
   return (
     <div className="w-full h-full mt-[-30px]">

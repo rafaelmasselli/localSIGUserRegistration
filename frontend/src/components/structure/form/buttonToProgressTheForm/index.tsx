@@ -22,7 +22,7 @@ export function ButtonToProgressTheForm({
   const sizeStyle = "px-[50px] py-2  rounded m-2 mobile:mx-3 mx-2";
   async function handleResetForm() {
     setLoading(true);
-    const id = cookie;
+    const id = cookie.id;
 
     if (id) {
       api.delete("/user/delete/code", { data: { id: id } }).then(() => {
@@ -65,6 +65,6 @@ export function ButtonToProgressTheForm({
           </button>
         </>
       )}
-    </div>  
+    </div>
   );
 }

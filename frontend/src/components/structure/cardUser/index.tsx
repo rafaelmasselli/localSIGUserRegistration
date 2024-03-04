@@ -40,13 +40,14 @@ export function CardUser({
     return "X".repeat(str.length - 3) + str.slice(-7);
   }
 
-  function addPhoneNumberMask(phoneNumber: string): string {
-    const numbers = phoneNumber.replace(/\D/g, "");
-    const formattedPhoneNumber = numbers.replace(
-      /(\d{2})(\d{5})(\d{4})/,
-      "($1) $2-$3"
-    );
-    return formattedPhoneNumber;
+  function addPhoneNumberMask(phone: string): string {
+    const number = phone.replace(/\D/g, "");
+
+    const ddd = phone.slice(0, 2);
+    const parte1 = phone.slice(2, 4);
+    const parte2 = phone.slice(4, 9);
+    const parte3 = number.slice(9, 13);
+    return `(${ddd}) ${parte1} ${parte2}-${parte3}`;
   }
 
   function formatDate(date: string): string {
@@ -77,7 +78,6 @@ export function CardUser({
 
   async function handleDeleteUser() {
     await api.delete(`/user/delete/${id}`);
-
   }
 
   return (
@@ -128,7 +128,7 @@ export function CardUser({
           <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
-      <div className="max-w-72 rounded overflow-hidden shadow-lg">
+      <div className="max-w-72 m-5 rounded overflow-hidden shadow-lg">
         <div className="px-6 py-4 flex flex-col justify-center">
           <div className="font-bold text-xl mb-2 mt-4">{fullName}</div>
           <div>

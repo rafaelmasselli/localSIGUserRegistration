@@ -106,10 +106,7 @@ export function CreateAddress() {
         return;
       }
 
-      if (uf === "" || city === "") {
-        openModal("Digite o CEP correspondente à sua cidade.");
-        setLoading(false);
-      } else if (!zipCode) {
+      if (!zipCode) {
         openModal("O campo CEP está incompleto.");
         setLoading(false);
       } else if (!street) {
